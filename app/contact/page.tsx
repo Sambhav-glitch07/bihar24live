@@ -1,0 +1,1 @@
+export default function ContactPage() { return <main className="mx-auto min-h-[55vh] max-w-4xl px-4 py-12"><h1 className="text-3xl font-black">Contact BIHAR 24 LIVE</h1><p className="mt-5 leading-8 text-neutral-700">Contact details have not yet been configured by the website owner. Please check back later.</p></main>; }

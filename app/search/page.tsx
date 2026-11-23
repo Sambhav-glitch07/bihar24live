@@ -1,0 +1,8 @@
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+type Props = { searchParams: Promise<{ q?: string | string[] }> };
+export default async function SearchPage({ searchParams }: Props) {
+  const params = await searchParams; const rawQuery = Array.isArray(params.q) ? params.q[0] : params.q; const query = (rawQuery || "").trim().slice(0, 120); let rows: { id: string; slug: string; title: string; description: string | null }[] = [];
+  if (query) { const supabase = await createClient(); const { data } = await supabase.from("article_translations").select("id, slug, title, description, articles!inner(status, published_at)").eq("language", "hi").eq("articles.status", "published").lte("articles.published_at", new Date().toISOString()).ilike("title", `%${query.replace(/[%_]/g, "\\$&")}%`).limit(30); rows = data ?? []; }
+  return <main className="mx-auto min-h-[55vh] max-w-5xl px-4 py-8"><h1 className="text-3xl font-black">खबर खोजें</h1><form className="mt-5 flex gap-2"><input name="q" defaultValue={query} placeholder="खबर का शीर्षक खोजें" className="min-w-0 flex-1 border p-3"/><button className="bg-red-700 px-5 font-bold text-white">खोजें</button></form>{query && <section className="mt-6 divide-y">{rows.length ? rows.map(row => <article key={row.id} className="py-4"><Link className="font-bold hover:text-red-700" href={`/news/${row.slug}`}>{row.title}</Link>{row.description && <p className="mt-1 text-sm text-neutral-600">{row.description}</p>}</article>) : <p className="mt-6 border p-8 text-center text-neutral-500">कोई प्रकाशित खबर नहीं मिली।</p>}</section>}</main>;
+}
